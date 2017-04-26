@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+  magento:
+    container_name: ${MAGENTO_NAME}
+    restart: always
+    image: daprejean/magento:latest
+    volumes:
+    - ./magento:/var/www/magento
+    ports:
+    - "${MAGENTO_EXTERNAL_HTTP_PORT}:80"
+    - "${MAGENTO_EXTERNAL_HTTPS_PORT}:443"
+    environment:
+    - http_proxy=${HTTP_PROXY}
+    - https_proxy=${HTTPS_PROXY}
+    - LOCAL_USER_ID=${LOCAL_USER_ID}
+    - LOCAL_GROUP_ID=${LOCAL_GROUP_ID}
