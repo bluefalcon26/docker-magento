@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 # system dependencies
-RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client
+RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client php-xml php-mysql
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7

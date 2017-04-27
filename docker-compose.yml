@@ -10,6 +10,9 @@ services:
     ports:
     - "${MAGENTO_EXTERNAL_HTTP_PORT}:80"
     - "${MAGENTO_EXTERNAL_HTTPS_PORT}:443"
+    links:
+    - redis:redis_host
+    - mysql:mysql_host
     environment:
     - HTTP_PROXY
     - HTTPS_PROXY
@@ -24,3 +27,24 @@ services:
     - REDIS_FPC_PORT
     - REDIS_FPC_PREFIX
     - REDIS_CACHE_PORT
+
+  redis:
+    container_name: ${MAGENTO_NAME}_redis
+    restart: always
+    image: redis:latest
+    ports:
+    - "6379"
+
+  mysql:
+    container_name: ${MAGENTO_NAME}_mysql
+    restart: always
+    image: mysql:latest
+    volumes:
+    - /data/${MAGENTO_NAME}_mysql:/var/lib/mysql
+    ports:
+    - "3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD
+    - MYSQL_USER
+    - MYSQL_PASSWORD
+    - MYSQL_DATABASE
