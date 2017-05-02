@@ -1,6 +1,8 @@
 FROM ubuntu:latest
 # system dependencies
-RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client php-xml php-mysql expect pv
+RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client php-xml php-mysql php-curl php-ldap expect pv
+
+RUN a2enmod ssl && a2ensite default-ssl
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7

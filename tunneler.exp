@@ -1,22 +1,30 @@
 #!/usr/bin/expect
 
-set timeout 1200
+set timeout 16
 log_user 0
 set command [lindex $argv 0]
 # tunnel and execute
 spawn ssh $::env(LDAP_USER)@$::env(LDAP_PROXY) "$command"
 # accept RSA, ECDSA, etc fingerprints
 expect {
-	"*?yes/no*" {send "yes\r";exp_continue}
+	"*?yes/no*"				{send "yes\r";exp_continue}
+	"*?ermission denied*"	{exit 1}
 	"*?assword:*"
 }
 send -- "$::env(LDAP_PASSWORD)\r"
-expect "*?erification code:*"
+expect {
+	"*?ermission denied*"	{exit 1}
+	"*?erification code:*"
+}
 send -- "$::env(LDAP_AUTH_CODE)\r"
 log_user 1
 expect {
-	"*?assword:*"	{exit 1}
-	"*?SQL dump*"
+	"*?ermission denied*"	{exit 1}
+	"*?assword:*"			{exit 1}
+	"*?SQL dump*"			{set timeout 1200; expect eof}
+	# any sufficiently large SQL dump will eventually output
+	# every work of Shakespeare, the Bible,
+	# and the first million prime numbers
+	eof						{exit 0}
 }
-expect eof
 exit 0

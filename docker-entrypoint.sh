@@ -27,15 +27,23 @@ sed -i "s/{db_host}/$DB_HOST/g; \
 if [ ! -s "/shared-dev.sql" ]
 then
 	echo "pulling remote db data..."
-
-	# get remote db size
-	db_size=$(tunneler.exp "mysql -ss -N -h$REMOTE_DB_HOST -u$REMOTE_DB_USER \
-		-p$REMOTE_DB_PASSWORD -e \
-		\"SELECT CEILING(SUM(data_length) / POWER(1024,2))
-		    FROM information_schema.tables
-		    WHERE table_schema IN ('$REMOTE_DB_NAME');\"
-		")
-	ret=$?
+	# account for unreliable connection proccesses
+	max_tries=3
+	ret=1
+	tries=0
+	while [ $ret -ne 0 ] && [ $tries -lt $max_tries ]
+	do
+		# get remote db size
+		db_size=$(tunneler.exp "mysql -ss -N -h$REMOTE_DB_HOST -u$REMOTE_DB_USER \
+			-p$REMOTE_DB_PASSWORD -e \
+			\"SELECT CEILING(SUM(data_length) / POWER(1024,2))
+			    FROM information_schema.tables
+			    WHERE table_schema IN ('$REMOTE_DB_NAME');\"
+			")
+		ret=$?
+		tries=$[$tries + 1]
+		echo "tried $tries times. Just got code $ret"
+	done
 
 	# in case $db_size doesn't get set, or it's not a number, don't break pv
 	if [ $ret -ne 0 ] || [ -z "$db_size" ]
@@ -46,16 +54,23 @@ then
 	echo "remote db size is $db_size"
 
 	# pull remote db data using expect and track progress
-	tunneler.exp "mysqldump -h$REMOTE_DB_HOST -u$REMOTE_DB_USER \
-		    -p$REMOTE_DB_PASSWORD $REMOTE_DB_NAME" \
-		| pv -f -p -s ${db_size}M \
-		> /shared-dev.sql
-	ret=$?
+	ret=1
+	tries=0
+	while [ $ret -ne 0 ] && [ $tries -lt $max_tries ]
+    do
+		tunneler.exp "mysqldump -h$REMOTE_DB_HOST -u$REMOTE_DB_USER \
+			-p$REMOTE_DB_PASSWORD $REMOTE_DB_NAME" \
+			| pv -f -p -s ${db_size}M \
+			| tee /shared-dev.sql
+		ret=$?
+		tries=$[$tries + 1]
+		echo "tried $tries times. Just got code $ret"
+	done
 
 	if [ $ret -ne 0 ]
 	then # failed
 		rm -f /shared-dev.sql
-		# exit 1
+		# exit 1 # let the script continue, we can always do db stuff manually
 	fi
 fi
 # place the pulled/exisiting dump into our target database
