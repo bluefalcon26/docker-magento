@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 # system dependencies
-RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client php-xml php-mysql
+RUN apt-get update && apt-get install -y vim curl wget git composer apache2 php libapache2-mod-php mysql-client php-xml php-mysql expect pv
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7
@@ -19,5 +19,6 @@ RUN useradd -m magento
 RUN usermod -g www-data magento
 
 # entrypoint
+COPY tunneler.exp /usr/local/bin
 COPY docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]

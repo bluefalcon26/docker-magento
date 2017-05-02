@@ -14,25 +14,38 @@ services:
     - redis:redis_host
     - mysql:mysql_host
     environment:
-    - HTTP_PROXY
-    - HTTPS_PROXY
-    - LOCAL_USER_ID
-    - LOCAL_GROUP_ID
-    - DB_HOST
-    - DB_USER
-    - DB_PASSWORD
-    - DB_NAME
-    - REDIS_HOST
-    - REDIS_SESSION_PORT
-    - REDIS_FPC_PORT
-    - REDIS_FPC_PREFIX
-    - REDIS_CACHE_PORT
+    - HTTP_PROXY=${HTTP_PROXY}
+    - HTTPS_PROXY=${HTTPS_PROXY}
+    - LOCAL_USER_ID=${LOCAL_USER_ID}
+    - LOCAL_GROUP_ID=${LOCAL_GROUP_ID}
+    - DB_HOST=${DB_HOST}
+    - DB_USER=${DB_USER}
+    - DB_PASSWORD=${DB_PASSWORD}
+    - DB_NAME=${DB_NAME}
+    - REDIS_HOST=${REDIS_HOST}
+    - REDIS_SESSION_PORT=${REDIS_SESSION_PORT}
+    - REDIS_FPC_PORT=${REDIS_FPC_PORT}
+    - REDIS_FPC_PREFIX=${REDIS_FPC_PREFIX}
+    - REDIS_CACHE_PORT=${REDIS_CACHE_PREFIX}
+    - REDIS_CACHE_PREFIX=${REDIS_CACHE_PREFIX}
+    - REMOTE_DB_HOST=${REMOTE_DB_HOST}
+    - REMOTE_DB_USER=${REMOTE_DB_USER}
+    - REMOTE_DB_PASSWORD=${REMOTE_DB_PASSWORD}
+    - REMOTE_DB_NAME=${REMOTE_DB_NAME}
+    - LDAP_PROXY=${LDAP_PROXY}
+    - LDAP_USER=${LDAP_USER}
+    - LDAP_PASSWORD=${LDAP_PASSWORD}
+    - LDAP_AUTH_CODE=${LDAP_AUTH_CODE}
+    - MYSQL_HOST=${MYSQL_HOST}
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DATABASE}
 
   redis:
     container_name: ${MAGENTO_NAME}_redis
     restart: always
     image: redis:latest
-    ports:
+    expose:
     - "6379"
 
   mysql:
@@ -41,10 +54,10 @@ services:
     image: mysql:latest
     volumes:
     - /data/${MAGENTO_NAME}_mysql:/var/lib/mysql
-    ports:
+    expose:
     - "3306"
     environment:
-    - MYSQL_ROOT_PASSWORD
-    - MYSQL_USER
-    - MYSQL_PASSWORD
-    - MYSQL_DATABASE
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DATABASE}

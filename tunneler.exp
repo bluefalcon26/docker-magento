@@ -1,0 +1,22 @@
+#!/usr/bin/expect
+
+set timeout 1200
+log_user 0
+set command [lindex $argv 0]
+# tunnel and execute
+spawn ssh $::env(LDAP_USER)@$::env(LDAP_PROXY) "$command"
+# accept RSA, ECDSA, etc fingerprints
+expect {
+	"*?yes/no*" {send "yes\r";exp_continue}
+	"*?assword:*"
+}
+send -- "$::env(LDAP_PASSWORD)\r"
+expect "*?erification code:*"
+send -- "$::env(LDAP_AUTH_CODE)\r"
+log_user 1
+expect {
+	"*?assword:*"	{exit 1}
+	"*?SQL dump*"
+}
+expect eof
+exit 0
