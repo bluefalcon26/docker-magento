@@ -61,7 +61,7 @@ then
 		tunneler.exp "mysqldump -h$REMOTE_DB_HOST -u$REMOTE_DB_USER \
 			-p$REMOTE_DB_PASSWORD $REMOTE_DB_NAME" \
 			| pv -f -p -s ${db_size}M \
-			| tee /shared-dev.sql
+			> /shared-dev.sql
 		ret=$?
 		tries=$[$tries + 1]
 		echo "tried $tries times. Just got code $ret"
@@ -82,4 +82,6 @@ pv -f -p /shared-dev.sql \
 
 # MAIN
 echo "starting main thread"
+# Apache gets grumpy about PID files pre-existing
+rm -f /usr/local/apache2/logs/httpd.pid
 exec apachectl -D FOREGROUND

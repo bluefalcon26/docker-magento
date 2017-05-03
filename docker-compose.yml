@@ -47,8 +47,6 @@ services:
     image: redis:latest
     expose:
     - "6379"
-    ports:
-    - "6379:6379"
 
   mysql:
     container_name: ${MAGENTO_NAME}_mysql
