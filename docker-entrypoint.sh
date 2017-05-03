@@ -23,8 +23,8 @@ sed -i "s/{db_host}/$DB_HOST/g; \
 		s/{redis_cache_prefix}/$REDIS_CACHE_PREFIX/g" \
 		/var/www/html/app/etc/local.xml
 
-# Have we gotten the database yet?
-if [ ! -s "/shared-dev.sql" ]
+# Have we gotten the database yet? But don't try if we don't have an auth code
+if [ ! -s "/shared-dev.sql" ] && [ ! -z "$LDAP_AUTH_CODE" ]
 then
 	echo "pulling remote db data..."
 	# account for unreliable connection proccesses
